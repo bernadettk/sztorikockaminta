@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreatív Kalandozások & Osztály Sorsoló</title>
+    <style>
+        :root {
+            --bg: #f9fafb;
+            --text-main: #111827;
+            --card-bg: #ffffff;
+            
+            --primary-orange: #ff9f43;
+            --primary-orange-hover: #ee8e32;
+            --primary-orange-light: #fff0df;
+            
+            --primary-teal: #1abc9c;
+            --primary-teal-hover: #16a085;
+            --primary-teal-light: #e0fcf6;
+
+            --primary-yellow: #f1c40f;
+            --primary-red: #e74c3c;
+            
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-orange);
+            font-size: 2.8rem;
+            margin-bottom: 2.5rem;
+            font-weight: 700;
+        }
+
+        .main-container {
+            max-width: 960px;
+            width: 100%;
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .main-container { grid-template-columns: 1fr 1fr; }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-5px); }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+            border-bottom: 3px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-orange h2 { color: var(--primary-orange); border-color: var(--primary-orange-light); }
+        .card-teal h2 { color: var(--primary-teal); border-color: var(--primary-teal-light); }
+
+        button {
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s, transform 0.1s;
+            width: 100%;
+        }
+        button:active { transform: scale(0.97); }
+
+        .btn-orange { background-color: var(--primary-orange); color: white; }
+        .btn-orange:hover { background-color: var(--primary-orange-hover); }
+
+        .btn-teal { background-color: var(--primary-teal); color: white; }
+        .btn-teal:hover { background-color: var(--primary-teal-hover); }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            min-height: 100px;
+        }
+
+        /* Sztorikocka stílusok */
+        .dice-container {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+        
+        .dice-box {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .dice-label { font-size: 0.9rem; font-weight: 600; color: #777; margin-bottom: 0.2rem; text-transform: uppercase; }
+        .dice-value { font-size: 1.4rem; font-weight: 700; color: var(--primary-orange); min-height: 2.1rem; }
+        
+        /* Opcionális animáció a kockapörgetéshez */
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .rolling { animation: roll 0.4s ease-out; }
+
+        /* Sorsoló stílusok */
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        textarea:focus { outline: none; border-color: var(--primary-teal); box-shadow: 0 0 0 4px var(--primary-teal-light); }
+
+        .action-group {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: auto 1fr;
+            margin-top: 1rem;
+        }
+        .action-group input[type="number"] {
+            width: 70px;
+            padding: 0.9rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .action-group input[type="number"]:focus { outline: none; border-color: var(--primary-teal); }
+
+        .list-result { margin: 0; padding-left: 2rem; font-size: 1.05rem; }
+        .list-result li { margin-bottom: 0.3rem; }
+        .group-title { font-weight: bold; margin-top: 1.5rem; font-size: 1.2rem; color: var(--primary-teal); }
+        .group-title:first-child { margin-top: 0; }
+        .winner-box { text-align: center; margin-top: 1rem; }
+        .winner-prefix { font-size: 1rem; color: #777; }
+        .winner-name { font-size: 2rem; font-weight: bold; color: var(--primary-teal); margin-top: 0.5rem; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <h1>Kreatív Kalandozások</h1>
+
+    <div class="main-container">
+        <div class="card card-orange">
+            <h2>🎲 Sztorikocka</h2>
+            <p style="color: #666; margin-top:-1.5rem; margin-bottom: 2rem; font-size: 1rem;">Dobj a három 10-oldalú kockával egy új történethez!</p>
+            
+            <div class="dice-container">
+                <div class="dice-box" id="dice-char">
+                    <div class="dice-label">Szereplő</div>
+                    <div class="dice-value">...</div>
+                </div>
+                <div class="dice-box" id="dice-loc">
+                    <div class="dice-label">Helyszín</div>
+                    <div class="dice-value">...</div>
+                </div>
+                <div class="dice-box" id="dice-conf">
+                    <div class="dice-label">Konfliktus</div>
+                    <div class="dice-value">...</div>
+                </div>
+            </div>
+
+            <button onclick="rollAllDice()" class="btn-orange" style="margin-top: 1.5rem; font-size: 1.2rem; padding: 1rem 1.5rem;">Dobj a kockákkal!</button>
+        </div>
+
+        <div class="card card-teal">
+            <h2>👥 Osztály Sorsoló</h2>
+            <p style="color: #666; margin-top:-1.5rem; margin-bottom: 1.5rem; font-size: 1rem;">Írd be a diákok neveit (minden nevet új sorba):</p>
+            
+            <textarea id="students-input" placeholder="Példa:&#10;Kovács Anna&#10;Nagy Bence&#10;Szabó Csilla..."></textarea>
+
+            <button onclick="randomizeOrder()" class="btn-teal">🔀 Véletlenszerű sorrend</button>
+            <button onclick="pickOne()" class="btn-teal" style="margin-top: 0.75rem;">🎯 Egy diák kisorsolása</button>
+            
+            <div class="action-group">
+                <input type="number" id="group-count" min="2" max="10" value="3" title="Csoportok száma">
+                <button onclick="createGroups()" class="btn-teal" style="margin-top: 0;">👥 Csoportokba osztás</button>
+            </div>
+
+            <div class="result-box" id="class-results">
+                Eredmények itt jelennek meg...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SZTORIKOCKA ADATOK ÉS LOGIKA ---
+        const characters = [
+            "Bátor majomkalóz", "Kíváncsi kis űrhajós", "Kétbalkezes varázslótanonc", "Szupertitkos ügynök", 
+            "Időutazó tudósnyuszi", "Elvarázsolt királylány", "Bölcs sárkány", "Lázadó robot", 
+            "Utcagyerek és kutyája", "Sokat látott nyomozó"
+        ];
+
+        const locations = [
+            "Ködös, elhagyatott kastély", "Nyüzsgő, jövőbeli metropolisz", "Lakatlan trópusi sziget", 
+            "Mélytengeri kutatóállomás", "Végtelen sivatag közepe", "Földalatti barlangrendszer", 
+            "Egy óriási fa lombkoronája", "Mozgó, gőzhajtású város", "Elfeledett könyvtár", 
+            "Űrhajó roncs a Marson"
+        ];
+
+        const conflicts = [
+            "Elveszett egy felbecsülhetetlen tárgy", "Ketyegő bomba / szorít az idő", 
+            "Árulás történt a csapatban", "Egy ősi átok felébredt", "Természeti katasztrófa fenyeget", 
+            "Két tűz közé (két frakció közé) szorultak", "Meg kell törni egy varázslatot", 
+            "Valakit tévesen vádolnak", "Egy sötét titokra derül fény", "Kifogytak az élelemből/energiából"
+        ];
+
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function rollAllDice() {
+            rollDice('dice-char', characters);
+            rollDice('dice-loc', locations);
+            rollDice('dice-conf', conflicts);
+        }
+
+        function rollDice(diceId, array) {
+            const diceBox = document.getElementById(diceId);
+            const valueDisplay = diceBox.querySelector('.dice-value');
+            
+            // Animáció hozzáadása
+            diceBox.classList.add('rolling');
+            
+            // Animáció után eredmény megjelenítése
+            setTimeout(() => {
+                valueDisplay.innerText = getRandomItem(array);
+                diceBox.classList.remove('rolling');
+            }, 400); // Az animáció időtartama
+        }
+
+        // --- OSZTÁLY SORSOLÓ LOGIKA ---
+
+        function getStudents() {
+            const text = document.getElementById('students-input').value;
+            return text.split('\n').map(name => name.trim()).filter(name => name !== '');
+        }
+
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function randomizeOrder() {
+            const students = getStudents();
+            const resultBox = document.getElementById('class-results');
+            
+            if (students.length === 0) {
+                resultBox.innerHTML = '<span style="color: #e74c3c;">Kérlek, írj be legalább egy nevet!</span>';
+                return;
+            }
+
+            const shuffled = shuffleArray([...students]);
+            let html = '<strong>Véletlenszerű sorrend:</strong><ol class="list-result">';
+            shuffled.forEach(student => {
+                html += `<li>${student}</li>`;
+            });
+            html += '</ol>';
+            resultBox.innerHTML = html;
+        }
+
+        function pickOne() {
+            const students = getStudents();
+            const resultBox = document.getElementById('class-results');
+
+            if (students.length === 0) {
+                resultBox.innerHTML = '<span style="color: #e74c3c;">Kérlek, írj be legalább egy nevet!</span>';
+                return;
+            }
+
+            const winner = getRandomItem(students);
+            resultBox.innerHTML = `
+                <div class="winner-box">
+                    <div class="winner-prefix">A kiválasztott diák:</div>
+                    <div class="winner-name">🎉 ${winner} 🎉</div>
+                </div>
+            `;
+        }
+
+        function createGroups() {
+            const students = getStudents();
+            const groupCount = parseInt(document.getElementById('group-count').value);
+            const resultBox = document.getElementById('class-results');
+
+            if (students.length === 0) {
+                resultBox.innerHTML = '<span style="color: #e74c3c;">Kérlek, írj be legalább egy nevet!</span>';
+                return;
+            }
+            if (isNaN(groupCount) || groupCount < 1) {
+                resultBox.innerHTML = '<span style="color: #e74c3c;">Érvénytelen csoportszám!</span>';
+                return;
+            }
+            if (groupCount > students.length) {
+                resultBox.innerHTML = '<span style="color: #e74c3c;">Több csoportot kértél, mint ahány diák van!</span>';
+                return;
+            }
+
+            const shuffled = shuffleArray([...students]);
+            const groups = Array.from({ length: groupCount }, () => []);
+
+            shuffled.forEach((student, index) => {
+                groups[index % groupCount].push(student);
+            });
+
+            let html = '';
+            groups.forEach((group, index) => {
+                html += `<div class="group-title">${index + 1}. Csoport:</div>`;
+                html += `<ul class="list-result" style="margin-bottom: 1.5rem;">`;
+                group.forEach(student => {
+                    html += `<li>${student}</li>`;
+                });
+                html += `</ul>`;
+            });
+
+            resultBox.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
